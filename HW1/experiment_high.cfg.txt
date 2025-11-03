@@ -1,0 +1,4 @@
+SubPelRefinement = 3
+MaxRef = 4
+RDOQ = 1
+SearchMode = 4
