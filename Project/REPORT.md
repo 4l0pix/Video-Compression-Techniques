@@ -1,20 +1,20 @@
-# Image and Video Compression using CompressAI - Project Report
+# Συμπίεση Εικόνας και Βίντεο με χρήση CompressAI - Αναφορά Έργου
 
-## Overview
+## Επισκόπηση
 
-The project focuses on evaluating learned image and video compression methods using ![**CompressAI**](https://interdigitalinc.github.io/CompressAI/) and extending the study with *BONUS experiments* (Video-for-Machines, Complexity & Resources, and VMAF correlation). The main objectives were:
+Το έργο εστιάζει στην αξιολόγηση μεθόδων συμπίεσης εικόνας και βίντεο με μηχανική μάθηση χρησιμοποιώντας το ![**CompressAI**](https://interdigitalinc.github.io/CompressAI/) και επεκτείνει τη μελέτη με *BONUS πειράματα* (Video-for-Machines, Πολυπλοκότητα & Πόροι, και συσχέτιση VMAF). Οι κύριοι στόχοι ήταν:
 
-* Benchmark several learned image codecs on the ![**Kodak dataset**](https://r0k.us/graphics/kodak/)
-* Implement an **ablation study** exploring the impact of preprocessing
-* Extend to video sequences ![**(UVG dataset)**](https://ultravideo.fi/dataset.html) to measure performance for machine vision tasks (object detection accuracy)
-* Collect computational and perceptual metrics for a complete evaluation
+* Αξιολόγηση διαφόρων codecs εικόνας με μηχανική μάθηση στο ![**σύνολο δεδομένων Kodak**](https://r0k.us/graphics/kodak/)
+* Υλοποίηση μιας **μελέτης ablation** που εξερευνά την επίδραση της προεπεξεργασίας
+* Επέκταση σε ακολουθίες βίντεο ![**(σύνολο δεδομένων UVG)**](https://ultravideo.fi/dataset.html) για μέτρηση απόδοσης σε εργασίες μηχανικής όρασης (ακρίβεια ανίχνευσης αντικειμένων)
+* Συλλογή υπολογιστικών και αντιληπτικών μετρικών για πλήρη αξιολόγηση
 
-## Implementation Progress
+## Πρόοδος Υλοποίησης
 
-### Environment Setup
+### Ρύθμιση Περιβάλλοντος
 
-* Python virtual environment created using **Python 3.11** to ensure stability
-* Core libraries installed with pinned versions:
+* Δημιουργία εικονικού περιβάλλοντος Python με **Python 3.11** για εξασφάλιση σταθερότητας
+* Εγκατάσταση βασικών βιβλιοθηκών με συγκεκριμένες εκδόσεις:
   * aiohappyeyeballs==2.6.1
   * aiohttp==3.13.1
   * aiosignal==1.4.0
@@ -86,187 +86,181 @@ The project focuses on evaluating learned image and video compression methods us
   
   
 
-Several incompatibility issues arose due to **`numpy>=2.0`**, which was downgraded to maintain compatibility with `compressai==1.2.8`.
+Προέκυψαν διάφορα προβλήματα ασυμβατότητας λόγω του **`numpy>=2.0`**, το οποίο υποβαθμίστηκε για να διατηρηθεί η συμβατότητα με το `compressai==1.2.8`.
 
-### Image Compression Baseline
+### Βασική Γραμμή Συμπίεσης Εικόνας
 
-* Implemented **`run_compressai.py`**, which evaluates multiple pretrained image codecs on the **Kodak dataset**:
+* Υλοποίηση του **`run_compressai.py`**, που αξιολογεί πολλαπλούς προεκπαιδευμένους codecs εικόνας στο **σύνολο δεδομένων Kodak**:
   * `bmshj2018_factorized`
   * `bmshj2018_hyperprior`
   * `mbt2018_mean`
   * `mbt2018`
   * `cheng2020_anchor`
   * `cheng2020_attn`
-* Quality ladder: **6 levels (Q=1,2,3,4,5,6)** common to all models
-* Computed standard metrics: **BPP, PSNR, MS-SSIM, encoding/decoding times**
-* Exported results to `results/image_rd_kodak.csv`
+* Κλίμακα ποιότητας: **6 επίπεδα (Q=1,2,3,4,5,6)** κοινά για όλα τα μοντέλα
+* Υπολογισμός τυπικών μετρικών: **BPP, PSNR, MS-SSIM, χρόνοι κωδικοποίησης/αποκωδικοποίησης**
+* Εξαγωγή αποτελεσμάτων σε `results/image_rd_kodak.csv`
 
-**Plotting:**
-`plot_rd_curves.py` generates:
-* Rate–Distortion (RD) curves for PSNR and MS-SSIM
-* Combined comparison between baseline and ablation runs
+**Γραφήματα:**
+Το `plot_rd_curves.py` δημιουργεί:
+* Καμπύλες Rate–Distortion (RD) για PSNR και MS-SSIM
+* Συνδυασμένη σύγκριση μεταξύ βασικής γραμμής και ablation εκτελέσεων
 
-**Outcome:**
-Successfully reproduced RD curves consistent with the CompressAI reference results.
+**Αποτέλεσμα:**
+Επιτυχής αναπαραγωγή καμπυλών RD συνεπείς με τα αποτελέσματα αναφοράς του CompressAI.
 
-### Ablation Study
+### Μελέτη Ablation
 
-* Implemented **`ablation.py`**, resizing input images (e.g., to 192×192) to study the effect of resolution
-* Compared against the baseline via an extended plotting script
-* Produced plots:
+* Υλοποίηση του **`ablation.py`**, αλλάζοντας το μέγεθος των εισερχόμενων εικόνων (π.χ., σε 192×192) για μελέτη της επίδρασης της ανάλυσης
+* Σύγκριση με τη βασική γραμμή μέσω εκτεταμένου script γραφημάτων
+* Δημιουργία γραφημάτων:
   * `rd_ablation_psnr.png`
   * `rd_psnr.png`
   * `rd_ms_ssim.png`
 
-**Observation:**
-Smaller inputs yield slightly lower PSNR at equal bitrates, confirming the expected trade-off between spatial detail and compressibility.
+**Παρατήρηση:**
+Μικρότερες εισροές αποδίδουν ελαφρώς χαμηλότερο PSNR σε ίσους ρυθμούς bit, επιβεβαιώνοντας την αναμενόμενη ανταλλαγή μεταξύ χωρικής λεπτομέρειας και συμπιεστότητας.
 
-### BONUS-1: Video for Machines
+### BONUS-1: Βίντεο για Μηχανές
 
-* Developed **`bonus.py`** to evaluate **CompressAI on video sequences**
-* Datasets: two 1080p UVG clips (`Bosphorus.yuv`, `HoneyBee.yuv`), 100 frames each
-* Models: `bmshj2018_factorized` and `cheng2020_attn`
-* For each frame:
-  * Compressed/decompressed frame
-  * Computed PSNR, MS-SSIM, BPP
-  * Detected objects with **YOLOv8n** → number of detections used as *proxy for mAP*
-* Generated **Accuracy-vs-Rate** curves
+* Ανάπτυξη του **`bonus.py`** για αξιολόγηση του **CompressAI σε ακολουθίες βίντεο**
+* Σύνολα δεδομένων: δύο clips UVG 1080p (`Bosphorus.yuv`, `HoneyBee.yuv`), 100 καρέ το καθένα
+* Μοντέλα: `bmshj2018_factorized` και `cheng2020_attn`
+* Για κάθε καρέ:
+  * Συμπιεσμένο/αποσυμπιεσμένο καρέ
+  * Υπολογισμός PSNR, MS-SSIM, BPP
+  * Ανίχνευση αντικειμένων με **YOLOv8n** → αριθμός ανιχνεύσεων χρησιμοποιήθηκε ως *proxy για mAP*
+* Δημιουργία καμπυλών **Ακρίβεια-έναντι-Ρυθμού**
 
-**Plot:**
+**Γράφημα:**
 `plots/bonus1_accuracy_vs_rate.png`
-* X-axis: Bitrate (bpp)
-* Y-axis: Detection accuracy (mean detections per frame)
+* Άξονας X: Ρυθμός bit (bpp)
+* Άξονας Y: Ακρίβεια ανίχνευσης (μέσες ανιχνεύσεις ανά καρέ)
 
-**Outcome:**
-Results show that detection performance degrades with aggressive compression; Cheng2020 maintains slightly higher accuracy at equivalent bitrate.
+**Αποτέλεσμα:**
+Τα αποτελέσματα δείχνουν ότι η απόδοση ανίχνευσης επιδεινώνεται με επιθετική συμπίεση· το Cheng2020 διατηρεί ελαφρώς υψηλότερη ακρίβεια σε ισοδύναμο ρυθμό bit.
 
-### BONUS-2: Complexity & Resources
+### BONUS-2: Πολυπλοκότητα & Πόροι
 
-* The same script collected:
-  * Encoding and decoding times (per frame)
-  * CPU RAM and GPU VRAM usage (via `psutil` and `torch.cuda.memory_allocated`)
-* Produced plot: `plots/bonus2_rate_vs_time.png`
-  * X-axis: Bitrate (bpp)
-  * Y-axis: Encoding time (s)
+* Το ίδιο script συνέλλεξε:
+  * Χρόνους κωδικοποίησης και αποκωδικοποίησης (ανά καρέ)
+  * Χρήση CPU RAM και GPU VRAM (μέσω `psutil` και `torch.cuda.memory_allocated`)
+* Δημιουργία γραφήματος: `plots/bonus2_rate_vs_time.png`
+  * Άξονας X: Ρυθμός bit (bpp)
+  * Άξονας Y: Χρόνος κωδικοποίησης (s)
 
-**Observation:**
-`cheng2020_attn` exhibits much higher computational complexity due to its autoregressive entropy coding. `bmshj2018_factorized` is 3–5× faster with smaller memory footprint.
+**Παρατήρηση:**
+Το `cheng2020_attn` παρουσιάζει πολύ υψηλότερη υπολογιστική πολυπλοκότητα λόγω της αυτοπαλίνδρομης κωδικοποίησης εντροπίας του. Το `bmshj2018_factorized` είναι 3–5× ταχύτερο με μικρότερο αποτύπωμα μνήμης.
 
-### BONUS-3: VMAF Correlation
+### BONUS-3: Συσχέτιση VMAF
 
-* Integrated `ffmpeg/libvmaf` metric computation
-* Calculated VMAF for representative frames (every 10th frame) to correlate perceptual quality with PSNR
-* Generated scatter plot: `plots/bonus3_vmaf_vs_psnr.png`
-  * X-axis: PSNR (dB)
-  * Y-axis: VMAF (0–100)
+* Ενσωμάτωση υπολογισμού μετρικής `ffmpeg/libvmaf`
+* Υπολογισμός VMAF για αντιπροσωπευτικά καρέ (κάθε 10ο καρέ) για συσχέτιση αντιληπτικής ποιότητας με PSNR
+* Δημιουργία διαγράμματος διασποράς: `plots/bonus3_vmaf_vs_psnr.png`
+  * Άξονας X: PSNR (dB)
+  * Άξονας Y: VMAF (0–100)
 
-**Observation:**
-Strong positive correlation (R²≈0.9). PSNR remains a reasonable indicator of perceived quality for high-quality regimes.
+**Παρατήρηση:**
+Ισχυρή θετική συσχέτιση (R²≈0.9). Το PSNR παραμένει λογικός δείκτης της αντιληπτής ποιότητας για καθεστώτα υψηλής ποιότητας.
 
-## Problems Encountered and Solutions
+## Προβλήματα που Προέκυψαν και Λύσεις
 
-| Issue | Description | Resolution |
-|-------|-------------|------------|
-| **FileNotFoundError: Zone.Identifier** | Caused by Windows metadata streams in image folder | Filtered filenames using `.endswith((".png",".jpg",".jpeg"))` |
-| **KeyError: 'strings'** | Some CompressAI outputs differed between models | Fixed by aligning expected keys across versions and ensuring correct metric call |
-| **Invalid quality "9"** | Models support Q∈[1,8] | Limited `QUALITIES=[1–6]` for consistency |
-| **Tensor type mismatch (CUDA vs CPU)** | Occurred when image or model were on different devices | Ensured `.to(device)` applied consistently |
-| **Out of memory (CUDA error)** | Full-resolution autoregressive models overloaded GPU | Moved CompressAI to CPU, added `torch.cuda.empty_cache()` |
-| **Autoregressive model slow execution** | `cheng2020_attn` sequential entropy coder cannot parallelize | Accept slower runtime; added progress bars (`tqdm`) and checkpoint saving |
-| **VMAF computation empty results** | Missing `libvmaf` model file or incompatible ffmpeg build | Installed `ffmpeg` with `libvmaf` and updated compute function |
-| **Very long runtime at 1080p** | Each frame takes 30–60 s on CPU | Retained full resolution but introduced safe checkpointing |
-| **Dimension mismatch in video compression** | Neural compression models require input dimensions divisible by 64 (1080p → 1088×1920) | Implemented padding functions `pad_to_multiple()` and `unpad_tensor()` with reflection padding |
-| **GPU utilization limitations** | `cheng2020_attn` model's autoregressive entropy coder runs sequentially on CPU despite GPU availability | Switched to GPU-compatible models: `bmshj2018_factorized`, `bmshj2018_hyperprior`, `mbt2018_mean` |
-| **Memory fragmentation** | Long-running experiments caused GPU memory fragmentation and gradual performance degradation | Added regular `torch.cuda.empty_cache()` calls and checkpoint-based memory management |
-| **YUV file reading bottleneck** | Reading YUV420 frames required manual byte parsing and chroma upsampling | Optimized with `cv2.resize(INTER_NEAREST)` and batched tensor operations |
-| **File I/O overhead** | Frequent saving/loading of temporary images for VMAF and YOLO detection created significant slowdown | Reduced VMAF sampling to every 10th frame and implemented temporary file cleanup |
-| **Model loading overhead** | Repeated model loading for each frame and quality level caused substantial initialization time | Preloaded all models at startup with `preload_models()` function |
+| Πρόβλημα | Περιγραφή | Επίλυση |
+|----------|-----------|---------|
+| **FileNotFoundError: Zone.Identifier** | Προκλήθηκε από μεταδεδομένα Windows στον φάκελο εικόνων | Φιλτράρισμα ονομάτων αρχείων χρησιμοποιώντας `.endswith((".png",".jpg",".jpeg"))` |
+| **KeyError: 'strings'** | Ορισμένες εξόδοι CompressAI διέφεραν μεταξύ μοντέλων | Διορθώθηκε με ευθυγράμμιση αναμενόμενων κλειδιών σε όλες τις εκδόσεις και εξασφάλιση σωστής κλήσης μετρικής |
+| **Invalid quality "9"** | Τα μοντέλα υποστηρίζουν Q∈[1,8] | Περιορισμός `QUALITIES=[1–6]` για συνέπεια |
+| **Tensor type mismatch (CUDA vs CPU)** | Συνέβη όταν εικόνα ή μοντέλο ήταν σε διαφορετικές συσκευές | Εξασφαλίστηκε συνεπής εφαρμογή `.to(device)` |
+| **Out of memory (CUDA error)** | Αυτοπαλίνδρομα μοντέλα πλήρους ανάλυσης υπερφόρτωσαν τη GPU | Μεταφορά CompressAI στη CPU, προσθήκη `torch.cuda.empty_cache()` |
+| **Autoregressive model slow execution** | Ο ακολουθιακός κωδικοποιητής εντροπίας του `cheng2020_attn` δεν μπορεί να παραλληλοποιηθεί | Αποδοχή πιο αργού χρόνου εκτέλεσης· προσθήκη γραμμών προόδου (`tqdm`) και αποθήκευση σημείων ελέγχου |
+| **VMAF computation empty results** | Λείπει αρχείο μοντέλου `libvmaf` ή μη συμβατή κατασκευή ffmpeg | Εγκαταστάθηκε `ffmpeg` με `libvmaf` και ενημερώθηκε η συνάρτηση υπολογισμού |
+| **Very long runtime at 1080p** | Κάθε καρέ χρειάζεται 30–60 s στη CPU | Διατηρήθηκε πλήρης ανάλυση αλλά εισήχθησαν ασφαλή σημεία ελέγχου |
+| **Dimension mismatch in video compression** | Τα νευρωνικά μοντέλα συμπίεσης απαιτούν διαστάσεις εισόδου διαιρετές με το 64 (1080p → 1088×1920) | Υλοποιήθηκαν συναρτήσεις padding `pad_to_multiple()` και `unpad_tensor()` με reflection padding |
+| **GPU utilization limitations** | Ο αυτοπαλίνδρομος κωδικοποιητής εντροπίας του μοντέλου `cheng2020_attn` εκτελείται ακολουθιακά στη CPU παρά τη διαθεσιμότητα GPU | Μετάβαση σε GPU-συμβατά μοντέλα: `bmshj2018_factorized`, `bmshj2018_hyperprior`, `mbt2018_mean` |
+| **Memory fragmentation** | Πειράματα μεγάλης διάρκειας προκάλεσαν κατακερματισμό μνήμης GPU και βαθμιαία υποβάθμιση απόδοσης | Προστέθηκαν τακτικές κλήσεις `torch.cuda.empty_cache()` και διαχείριση μνήμης βασισμένη σε σημεία ελέγχου |
+| **YUV file reading bottleneck** | Η ανάγνωση καρέ YUV420 απαιτούσε χειροκίνητη ανάλυση bytes και chroma upsampling | Βελτιστοποιήθηκε με `cv2.resize(INTER_NEAREST)` και batched tensor operations |
+| **File I/O overhead** | Η συχνή αποθήκευση/φόρτωση προσωρινών εικόνων για VMAF και YOLO detection δημιούργησε σημαντική επιβράδυνση | Μειώθηκε η δειγματοληψία VMAF σε κάθε 10ο καρέ και υλοποιήθηκε καθαρισμός προσωρινών αρχείων |
+| **Model loading overhead** | Η επαναλαμβανόμενη φόρτωση μοντέλων για κάθε καρέ και επίπεδο ποιότητας προκάλεσε σημαντικό χρόνο αρχικοποίησης | Προφορτώθηκαν όλα τα μοντέλα στην εκκίνηση με συνάρτηση `preload_models()` |
 
-## Performance Bottlenecks Identified
+## Εντοπισμένα Σημεία Εμπόδια Απόδοσης
 
-**Major Bottlenecks:**
-1. **Autoregressive entropy coding**: Sequential nature of `cheng2020_attn` entropy coder cannot be parallelized on GPU
-2. **YUV frame processing**: Manual YUV→RGB conversion and chroma upsampling consumes ~15% of frame processing time
-3. **Model switching overhead**: Switching between 3 models × 5 quality levels per frame introduces context switching penalties
-4. **Memory transfers**: Frequent CPU↔GPU transfers for intermediate results and metric computation
+**Κύρια Σημεία Εμπόδια:**
+1. **Αυτοπαλίνδρομη κωδικοποίηση εντροπίας**: Η ακολουθιακή φύση του κωδικοποιητή εντροπίας του `cheng2020_attn` δεν μπορεί να παραλληλοποιηθεί στη GPU
+2. **Επεξεργασία καρέ YUV**: Μετατροπή YUV→RGB και chroma upsampling καταναλώνει ~15% του χρόνου επεξεργασίας καρέ
+3. **Κόστος εναλλαγής μοντέλων**: Εναλλαγή μεταξύ 3 μοντέλων × 5 επίπεδα ποιότητας ανά καρέ εισάγει ποινές εναλλαγής συμφραζομένων
+4. **Μεταφορές μνήμης**: Συχνές μεταφορές CPU↔GPU για ενδιάμεσα αποτελέσματα και υπολογισμό μετρικών
 
-**Measured Performance:**
-- **Bosphorus sequence**: ~27 seconds per frame (100 frames = 45 minutes)
-- **HoneyBee sequence**: ~30 seconds per frame (100 frames = 50 minutes)  
-- **Total experiment time**: ~95 minutes for 200 frames (3000 total records)
+**Μετρημένη Απόδοση:**
+- **Ακολουθία Bosphorus**: ~27 δευτερόλεπτα ανά καρέ (100 καρέ = 45 λεπτά)
+- **Ακολουθία HoneyBee**: ~30 δευτερόλεπτα ανά καρέ (100 καρέ = 50 λεπτά)  
+- **Συνολικός χρόνος πειράματος**: ~95 λεπτά για 200 καρέ (3000 συνολικά εγγραφές)
 
-**GPU Utilization:**
-- Stable memory allocation: 0.45GB allocated, 3.29GB reserved
-- No memory leaks detected over 1.5-hour runtime
-- Consistent performance across both video sequences
+**Εκμετάλλευση GPU:**
+- Σταθερή κατανομή μνήμης: 0.45GB κατειλημμένα, 3.29GB δεσμευμένα
+- Δεν εντοπίστηκαν διαρροές μνήμης σε 1.5 ώρα εκτέλεσης
+- Συνεπής απόδοση σε αμφότερες τις ακολουθίες βίντεο
 
-## Optimization Strategies Implemented
+## Υλοποιημένες Στρατηγικές Βελτιστοποίησης
 
-**Code-level Optimizations:**
-- Tensor padding to meet model dimension requirements (64-pixel multiples)
-- Preloading of all models to avoid repeated initialization
-- Regular GPU memory cleanup with `torch.cuda.empty_cache()`
-- Reduced VMAF computation frequency (every 10th frame)
-- Automated temporary file management
+**Βελτιστοποιήσεις Επιπέδου Κώδικα:**
+- Padding tensor για πλήρωση απαιτήσεων διαστάσεων μοντέλων (64-pixel πολλαπλάσια)
+- Προφόρτωση όλων των μοντέλων για αποφυγή επαναλαμβανόμενης αρχικοποίησης
+- Τακτικός καθαρισμός μνήμης GPU με `torch.cuda.empty_cache()`
+- Μειωμένη συχνότητα υπολογισμού VMAF (κάθε 10ο καρέ)
+- Αυτοματοποιημένη διαχείριση προσωρινών αρχείων
 
-**Pipeline Improvements:**
-- Checkpoint system saving progress every 10 frames
-- Comprehensive error handling with graceful recovery
-- Virtual environment automation in execution scripts
-- Sequential pipeline execution with dependency management
+**Βελτιώσεις Pipeline:**
+- Σύστημα checkpoints που αποθηκεύει πρόοδο κάθε 10 καρέ
+- Συνολική διαχείριση σφαλμάτων με ομαλή ανάκαμψη
+- Αυτοματοποίηση εικονικού περιβάλλοντος σε scripts εκτέλεσης
+- Ακολουθιακή εκτέλεση pipeline με διαχείριση εξαρτήσεων
 
-## Current Status
+## Τρέχουσα Κατάσταση
 
-| Component | Status | Output |
-|-----------|---------|--------|
-| **Image baseline (Kodak)** | Completed | `image_rd_kodak.csv`, `rd_psnr.png` |
-| **Ablation experiment** | Completed | `image_rd_ablation_resize_192x192.csv`, `rd_ablation_psnr.png` |
-| **Video compression (BONUS-1)** | Completed / Running | `bonus1_accuracy_vs_rate.png` |
-| **Complexity and resource metrics (BONUS-2)** | Completed / Running | `bonus2_rate_vs_time.png` |
-| **VMAF correlation (BONUS-3)** | Partially computed | `bonus3_vmaf_vs_psnr.png` (populated for tested frames) |
+| Στοιχείο | Κατάσταση | Έξοδος |
+|---------|--------|-----|
+| **Βασική γραμμή εικόνας (Kodak)** | Ολοκληρωμένο | `image_rd_kodak.csv`, `rd_psnr.png` |
+| **Πείραμα ablation** | Ολοκληρωμένο | `image_rd_ablation_resize_192x192.csv`, `rd_ablation_psnr.png` |
+| **Συμπίεση βίντεο (BONUS-1)** | Ολοκληρωμένο / Εκτελείται | `bonus1_accuracy_vs_rate.png` |
+| **Μετρικές πολυπλοκότητας και πόρων (BONUS-2)** | Ολοκληρωμένο / Εκτελείται | `bonus2_rate_vs_time.png` |
+| **Συσχέτιση VMAF (BONUS-3)** | Μερικώς υπολογισμένο | `bonus3_vmaf_vs_psnr.png` (συμπληρωμένο για δοκιμασμένα καρέ) |
 
-All result CSVs are being stored in the `results/` directory, automatically updated every 10 frames.
+Όλα τα CSVs αποτελεσμάτων αποθηκεύονται στον φάκελο `results/`, ενημερώνονται αυτόματα κάθε 10 καρέ.
 
-## Final Implementation Notes
+## Τελικές Σημειώσεις Υλοποίησης
 
-**Successfully Resolved:**
-- All GPU compatibility issues through model selection
-- Dimension mismatch problems with proper padding
-- Memory management for long-running experiments
-- Complete pipeline automation from compression to plotting
+**Επιτυχώς Επιλυθέντα:**
+- Όλα τα θέματα συμβατότητας GPU μέσω επιλογής μοντέλων
+- Προβλήματα μη συμφωνίας διαστάσεων με κατάλληλο padding
+- Διαχείριση μνήμης για πειράματα μεγάλης διάρκειας
+- Πλήρης αυτοματοποίηση pipeline από συμπίεση έως γραφήματα
 
-**Remaining Constraints:**
-- Fundamental limitation of autoregressive models requiring CPU entropy coding
-- YUV file format processing overhead inherent to the dataset
-- Computational intensity of full 1080p video compression at multiple quality levels
+**Υπάρχοντες Περιορισμοί:**
+- Θεμελιώδης περιορισμός αυτοπαλίνδρομων μοντέλων που απαιτούν κωδικοποίηση εντροπίας CPU
+- Κόστος επεξεργασίας μορφής αρχείου YUV ενδογενής στο σύνολο δεδομένων
+- Υπολογιστική ένταση πλήρους συμπίεσης βίντεο 1080p σε πολλαπλά επίπεδα ποιότητας
 
-**Scalability Considerations:**
-- Current implementation suitable for research-scale experiments
-- For production deployment, would require:
-  - Batched frame processing
-  - Distributed computing across multiple GPUs  
-  - Optimized YUV decoding pipeline
-  - Cached model instances per quality level
+**Επικαλείας:**
+- Η τρέχουσα υλοποίηση είναι κατάλληλη για πειράματα κλίμακας έρευνας
+- Για παραγωγική ανάπτυξη, θα απαιτούνταν:
+  - Επεξεργασία καρέ σε batches
+  - Κατανεμημένος υπολογισμός σε πολλαπλές GPUs  
+  - Βελτιστοποιημένο pipeline αποκωδικοποίησης YUV
+  - Αποθηκευμένα instances μοντέλων ανά επίπεδο ποιότητας
 
-## Summary and Conclusions
+## Σύνοψη και Συμπεράσματα
 
-All required and optional (BONUS) components of the project have been **implemented and validated**. The system produces:
+Όλα τα απαιτούμενα και προαιρετικά (BONUS) στοιχεία του έργου έχουν **υλοποιηθεί και επικυρωθεί**. Το σύστημα παράγει:
 
-* Standard RD curves (PSNR, MS-SSIM)
-* Comparative ablation results
-* Extended video-for-machines analysis, including object-detection accuracy and resource profiling
-* Preliminary perceptual correlation using VMAF
+* Τυπικές καμπύλες RD (PSNR, MS-SSIM)
+* Συγκριτικά αποτελέσματα ablation
+* Εκτεταμένη ανάλυση βίντεο-για-μηχανές, συμπεριλαμβανομένης ακρίβειας ανίχνευσης αντικειμένων και προφίλ πόρων
+* Προκαταρκτική αντιληπτική συσχέτιση χρησιμοποιώντας VMAF
 
-**Key Findings:**
+**Κύρια Ευρήματα:**
 
-* Learned codecs achieve significant rate savings at comparable PSNR
-* Cheng2020 provides higher quality at low bitrates but at substantial computational cost
-* For "video for machines," excessive compression directly reduces detection accuracy, highlighting the trade-off between rate and downstream task performance
-* PSNR, SSIM, and VMAF remain strongly correlated for high-quality compression regimes
+* Τα μοντέλα με μηχανική μάθηση επιτυγχάνουν σημαντική εξοικονόμηση ρυθμού σε συγκρίσιμο PSNR
+* Το Cheng2020 παρέχει υψηλότερη ποιότητα σε χαμηλούς ρυθμούς bit αλλά με σημαντικό υπολογιστικό κόστος
+* Για "βίντεο για μηχανές," η υπερβολική συμπίεση μειώνει άμεσα την ακρίβεια ανίχνευσης, υπογραμμίζοντας την ανταλλαγή μεταξύ ρυθμού και απόδοσης σε επακόλουθες εργασίες
+* Τα PSNR, SSIM, και VMAF παραμένουν ισχυρά συσχετισμένα για καθεστώτα συμπίεσης υψηλής ποιότητας
 
-**Pending optimizations** (for future work):
-* Integrate batched VMAF computation or multi-threaded encoding
-* Extend to additional video baselines (e.g., VVC, H.266)
-* Automate frame sampling to reduce computational burden
-
-The implementation demonstrates robust handling of real-world challenges including GPU memory management, model compatibility issues, and large-scale video processing. The modular design allows for easy extension to additional datasets, models, and evaluation metrics while maintaining consistent performance across extended runtimes.
