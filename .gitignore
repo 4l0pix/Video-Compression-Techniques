@@ -192,3 +192,5 @@ temp/
 scripts/*.run
 *.run
 
+*.yuv
+*.mp4
